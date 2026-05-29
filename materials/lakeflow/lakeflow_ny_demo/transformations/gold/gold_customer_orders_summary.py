@@ -2,7 +2,7 @@ from pyspark import pipelines as dp
 from pyspark.sql import functions as F
 
 @dp.materialized_view(
-    name="gold_customer_orders_summary",
+    name="gold_customer_orders_summary", ##1 create or replace -> ## 3 mode (overwrite)
     comment="Aggregated customer order statistics - demonstrates materialized view with batch processing"
 )
 def gold_customer_orders_summary():
@@ -17,7 +17,7 @@ def gold_customer_orders_summary():
     """
     customers = spark.read.table("silver_customers_scd1")
     orders = spark.read.table("silver_orders_cleaned")
-    
+    #2 wykonaj to query przed zapislem 
     return (
         orders
         .join(customers, orders.o_custkey == customers.c_custkey, "left")

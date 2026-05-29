@@ -1,4 +1,4 @@
---SET order_path = '/Volumes/training_catalog/default/datasets/orders';
+
 
 -- 1. RAW ORDERS (BRONZE) – target streaming table
 CREATE OR REFRESH STREAMING TABLE bronze_orders;

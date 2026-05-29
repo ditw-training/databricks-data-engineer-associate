@@ -306,14 +306,14 @@ def generate_dirty_orders_fail():
 
 
 # Example usage (uncomment to run):
-generate_batch_0()  # Start with historical data
-# generate_batch_1()  # Then run incremental batches one by one
-# generate_batch_2()
+#generate_batch_0()  # Start with historical data
+#generate_batch_1()  # Then run incremental batches one by one
+generate_batch_2()
 # generate_batch_3()
 # generate_batch_4()
 # generate_batch_5()
 
 # --- Expectations demo ---
-# generate_orders_clean()             # 1. Seed clean orders first
-# generate_dirty_orders_validation()  # 2. Drop demo  — pipeline continues
-# generate_dirty_orders_fail()        # 3. Fail demo  — pipeline stops ⚠️
+#generate_orders_clean()             # 1. Seed clean orders first
+#generate_dirty_orders_validation()  # 2. Drop demo  — pipeline continues
+generate_dirty_orders_fail()        # 3. Fail demo  — pipeline stops ⚠️
