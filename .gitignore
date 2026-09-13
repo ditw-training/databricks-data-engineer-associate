@@ -26,3 +26,9 @@ spark-warehouse/
 # Training utilities (local only)
 utilization/
 *.zip
+
+# PDF build workspace (scripts/build_pdfs.sh)
+.build/
+
+# Agent working notes (local only)
+.agents/

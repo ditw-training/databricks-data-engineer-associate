@@ -1,0 +1,77 @@
+# =============================================================================
+# RetailHub — Declarative Automation Bundle (formerly Databricks Asset Bundles)
+# =============================================================================
+# Bundle root file. Everything the capstone deploys (the Lakeflow Spark
+# Declarative Pipeline + the 3-task Lakeflow Job) is declared under resources/.
+#
+# Deploy from this directory (materials/cicd/):
+#   databricks bundle validate -t dev --var="catalog=retailhub_<your_slug>"
+#   databricks bundle deploy   -t dev --var="catalog=retailhub_<your_slug>"
+#   databricks bundle run      -t dev --var="catalog=retailhub_<your_slug>" retailhub_job
+#
+# See README.md in this folder for bundle anatomy and authentication.
+# =============================================================================
+
+bundle:
+  name: retailhub
+
+# Resource definitions live in separate files — one per resource type.
+include:
+  - resources/*.yml
+
+# The pipeline sources and job task notebooks live OUTSIDE this folder
+# (materials/lakeflow/, materials/orchestration/). Listing them under
+# sync.paths widens the set of local files uploaded on `bundle deploy`,
+# so the relative references in resources/*.yml resolve in the workspace.
+sync:
+  paths:
+    - .
+    - ../lakeflow/lakeflow_demo
+    - ../orchestration
+
+variables:
+  catalog:
+    description: >-
+      Target Unity Catalog for the RetailHub capstone — your personal
+      training catalog, e.g. retailhub_jan_kowalski.
+    default: retailhub_trainer
+  schema_prefix:
+    description: >-
+      Prefix for the pipeline target schema. The pipeline publishes its
+      tables to <catalog>.<schema_prefix>_lakeflow.
+    default: retailhub
+
+targets:
+  # ---------------------------------------------------------------------------
+  # dev — the default target used during the training.
+  # mode: development means:
+  #   * resource names get the prefix "[dev <your user name>] "
+  #   * schedules and triggers are paused automatically
+  #   * concurrent runs are relaxed, deployment locks are not enforced
+  #   * resources are tagged as development copies and are safe to delete
+  # ---------------------------------------------------------------------------
+  dev:
+    mode: development
+    default: true
+    # Host comes from your CLI profile (see README.md — auth via profile).
+    # Uncomment and pin only if you use more than one workspace:
+    # workspace:
+    #   host: https://adb-XXXXXXXXXXXXXXXX.XX.azuredatabricks.net
+
+  # ---------------------------------------------------------------------------
+  # prod — stub for the discussion "what changes between dev and prod?".
+  # NOT used during the training. In production you would typically:
+  #   * switch mode to production (no name prefix, triggers stay active)
+  #   * deploy to a shared root_path, not a user home folder
+  #   * run as a service principal (run_as), not a personal identity
+  #   * override variables per environment (catalog: retailhub_prod)
+  # ---------------------------------------------------------------------------
+  # prod:
+  #   mode: production
+  #   workspace:
+  #     host: https://adb-XXXXXXXXXXXXXXXX.XX.azuredatabricks.net
+  #     root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
+  #   variables:
+  #     catalog: retailhub_prod
+  #   run_as:
+  #     service_principal_name: "00000000-0000-0000-0000-000000000000"
