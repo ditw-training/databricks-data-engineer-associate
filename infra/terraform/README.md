@@ -64,7 +64,7 @@ EXEC dbo.lakeflowSetupChangeDataCapture @Tables = 'SCHEMAS:SalesLT', @User = 'la
 EXEC dbo.lakeflowFixPermissions        @Tables = 'SCHEMAS:SalesLT', @User = 'lakeflow_connect';
 ```
 
-**Lakeflow Connect UI steps** (summary; details in `notebooks/day1/demo/02a_lakeflow_connect_demo.ipynb`):
+**Lakeflow Connect UI steps** (summary; field-by-field checklist for the manual connection: [`infra/LAKEFLOW_CONNECT_CONNECTION.md`](../LAKEFLOW_CONNECT_CONNECTION.md); demo flow in `notebooks/day1/demo/02a_lakeflow_connect_demo.ipynb`):
 
 1. `terraform output lakeflow_connect_connection_summary` → host / port 1433 / database / user.
 2. Workspace → **Catalog → External data → Connections → Create connection** → type **SQL Server**, paste host/port/user (`lakeflow_connect`) + the password you set in the script.
