@@ -80,7 +80,7 @@ Smoke test **the day before Day 1**: external location `LIST 'abfss://external@�
 |---|---|---|
 | Databricks DBUs | New workspace with SKU `trial` ⇒ 14-day free trial | **Schedule the 3 training days inside the trial window** — DBUs ≈ free |
 | Databricks compute | Use **serverless** SQL warehouses / jobs / pipelines | No idle VMs; serverless bills only while running (after the trial, serverless DBUs bill normally — keep pipelines small, stop what you demo) |
-| Azure SQL | `GP_S_Gen5_1` serverless, `min_capacity 0.5`, auto-pause 60 min | Compute cost → 0 when idle; ~4 GB storage pennies. **CDC needs ≥ 1 vCore (or ≥ S3 DTU)** — this SKU is the cheapest that qualifies. Change Tracking (see `../sql/enable_cdc.sql`) works on any tier if you downgrade |
+| Azure SQL | `GP_S_Gen5_1` serverless, `min_capacity 0.5`, auto-pause 15 min (Azure minimum) | Compute cost → 0 when idle; ~4 GB storage pennies. **CDC needs ≥ 1 vCore (or ≥ S3 DTU)** — this SKU is the cheapest that qualifies. Change Tracking (see `../sql/enable_cdc.sql`) works on any tier if you downgrade |
 | SQL auto-pause caveat | First query after pause takes ~30–60 s to resume | Warm the DB before the demo slot |
 | Storage | `Standard_LRS`, small sample data | Cents for 3 days |
 | Everything | `auto-delete-after` tag + `terraform destroy` | Nothing lingers past Day 3 |

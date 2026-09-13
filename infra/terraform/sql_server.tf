@@ -4,7 +4,7 @@
 # COST/TIER NOTE (do not "optimize" the SKU down):
 #   CDC on Azure SQL Database requires >= S3 (DTU) or >= 1 vCore.
 #   GP_S_Gen5_1 = General Purpose Serverless, 1 vCore max - the cheapest tier
-#   that can still enable CDC, and it auto-pauses after 60 min idle (compute
+#   that can still enable CDC, and it auto-pauses after 15 min idle (the Azure minimum) (compute
 #   billing drops to zero; storage pennies remain).
 #   Cheaper alternative: CHANGE TRACKING works on any tier and is also
 #   supported by Lakeflow Connect - see infra/sql/enable_cdc.sql.
@@ -28,7 +28,7 @@ resource "azurerm_mssql_database" "adventureworks" {
   # Serverless General Purpose, 1 vCore - smallest CDC-capable SKU.
   sku_name                    = "GP_S_Gen5_1"
   min_capacity                = 0.5
-  auto_pause_delay_in_minutes = 60
+  auto_pause_delay_in_minutes = 15 # Azure minimum; resume on next login takes ~1 min
   max_size_gb                 = 4
 
   # Pre-load the AdventureWorksLT sample (SalesLT schema) at creation.
