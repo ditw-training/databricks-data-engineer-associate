@@ -70,7 +70,7 @@ Every lab follows the same pattern: *Scenario → tasks with `# TODO` → Guidan
 
 | Lab | Topic | Day | Guide | Solution |
 |-----|-------|-----|:---:|:---:|
-| lab_01 | Platform & Workspace First Steps (Serverless, UC, Volumes) | 1 | ✅ | — (guided) |
+| lab_01 | Platform & Workspace First Steps (Serverless, UC, Volumes) | 1 | ✅ | ✅ |
 | lab_02 | Batch Ingestion (readers, schemas, CTAS) | 1 | ✅ | ✅ |
 | lab_03 | Delta DML & Time Travel | 1 | ✅ | ✅ |
 | lab_06 | Transformations & Modeling (joins, windows, dedup) | self-study | ✅ | ✅ |
