@@ -1,11 +1,15 @@
 -- ============================================================================
 -- enable_cdc.sql - AdventureWorksLT CDC enablement for Lakeflow Connect
 -- ============================================================================
--- Run AFTER `terraform apply`, against the AdventureWorksLT database (NOT
--- master). Idempotent: safe to re-run any number of times.
+-- Run AFTER `terraform apply` and AFTER create_login_master.sql (which creates
+-- the lakeflow_connect server login), against the AdventureWorksLT database
+-- (NOT master). Idempotent: safe to re-run any number of times.
 --
 -- Exact invocation (values come from `terraform output`):
 --
+--   sqlcmd -S <sql_server_fqdn> -d master \
+--          -U <sql_admin_login> -P '<sql_admin_password>' \
+--          -i infra/sql/create_login_master.sql
 --   sqlcmd -S <sql_server_fqdn> -d AdventureWorksLT \
 --          -U <sql_admin_login> -P '<sql_admin_password>' \
 --          -i infra/sql/enable_cdc.sql
@@ -20,8 +24,8 @@
 -- CHANGE TRACKING alternative at the bottom instead (any tier, and also
 -- supported by Lakeflow Connect).
 --
--- BEFORE THE TRAINING: replace the lakeflow_connect placeholder password
--- below and use the same value in the Lakeflow Connect connection UI.
+-- The lakeflow_connect password is set in create_login_master.sql - use that
+-- value in the Lakeflow Connect connection UI.
 -- ============================================================================
 
 -- ----------------------------------------------------------------------------
@@ -86,15 +90,26 @@ GO
 -- ----------------------------------------------------------------------------
 -- 3. Low-privilege user for the Lakeflow Connect connection (idempotent)
 -- ----------------------------------------------------------------------------
--- Azure SQL Database: a CONTAINED database user with password - no server
--- login needed, and it survives independently of master. Use this user (not
--- the admin) in the Lakeflow Connect connection.
--- >>> REPLACE THE PLACEHOLDER PASSWORD BEFORE RUNNING <<<
+-- Database user mapped to the lakeflow_connect server LOGIN created by
+-- create_login_master.sql (Azure SQL DB needs the login for the
+-- ##MS_DatabaseConnector## server role). Use this user (not the admin) in the
+-- Lakeflow Connect connection.
+-- A contained user with the same name (older version of this script) is
+-- replaced by the login-mapped one.
+IF EXISTS (
+    SELECT 1 FROM sys.database_principals
+    WHERE name = N'lakeflow_connect' AND authentication_type_desc = N'DATABASE'
+)
+BEGIN
+    DROP USER lakeflow_connect;
+    PRINT 'Dropped contained user lakeflow_connect (replaced by login-mapped user)';
+END
+
 IF NOT EXISTS (
     SELECT 1 FROM sys.database_principals WHERE name = N'lakeflow_connect'
 )
 BEGIN
-    CREATE USER lakeflow_connect WITH PASSWORD = N'CHANGE_ME-LakeflowC0nnect!';
+    CREATE USER lakeflow_connect FOR LOGIN lakeflow_connect;
     PRINT 'User lakeflow_connect created';
 END
 ELSE
@@ -108,18 +123,24 @@ GRANT SELECT ON SCHEMA::cdc TO lakeflow_connect;
 GO
 
 -- Metadata access the SQL Server connector needs on Azure SQL Database
--- (docs: "Microsoft SQL Server database user requirements").
+-- (docs: "Microsoft SQL Server database user requirements" - Azure SQL
+-- Database table). The sp_tables/sp_columns_100/... EXECUTE grants from the
+-- on-prem table do NOT apply here and fail with error 4629 outside master.
 GRANT VIEW DATABASE STATE TO lakeflow_connect;
+GRANT SELECT ON OBJECT::sys.schemas                TO lakeflow_connect;
+GRANT SELECT ON OBJECT::sys.tables                 TO lakeflow_connect;
+GRANT SELECT ON OBJECT::sys.columns                TO lakeflow_connect;
+GRANT SELECT ON OBJECT::sys.key_constraints        TO lakeflow_connect;
+GRANT SELECT ON OBJECT::sys.foreign_keys           TO lakeflow_connect;
+GRANT SELECT ON OBJECT::sys.check_constraints      TO lakeflow_connect;
+GRANT SELECT ON OBJECT::sys.default_constraints    TO lakeflow_connect;
+GRANT SELECT ON OBJECT::sys.change_tracking_tables TO lakeflow_connect;
+GRANT SELECT ON OBJECT::sys.objects                TO lakeflow_connect;
+GRANT SELECT ON OBJECT::sys.triggers               TO lakeflow_connect;
 GRANT SELECT ON OBJECT::sys.indexes                TO lakeflow_connect;
 GRANT SELECT ON OBJECT::sys.index_columns          TO lakeflow_connect;
-GRANT SELECT ON OBJECT::sys.columns                TO lakeflow_connect;
-GRANT SELECT ON OBJECT::sys.tables                 TO lakeflow_connect;
 GRANT SELECT ON OBJECT::sys.fulltext_index_columns TO lakeflow_connect;
 GRANT SELECT ON OBJECT::sys.fulltext_indexes       TO lakeflow_connect;
-GRANT EXECUTE ON OBJECT::sp_tables         TO lakeflow_connect;
-GRANT EXECUTE ON OBJECT::sp_columns_100    TO lakeflow_connect;
-GRANT EXECUTE ON OBJECT::sp_pkeys          TO lakeflow_connect;
-GRANT EXECUTE ON OBJECT::sp_statistics_100 TO lakeflow_connect;
 GO
 
 -- DDL support objects (schema-change handling for CDC) are NOT created here.

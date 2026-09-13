@@ -8,7 +8,7 @@ Provisions everything the 3-day Databricks Data Engineer Associate training need
 | ADLS Gen2 storage account (+ `raw`, `external` containers) | Auto Loader / COPY INTO landing zone, UC external location backing |
 | Databricks access connector + `Storage Blob Data Contributor` role | Managed-identity bridge for Unity Catalog |
 | Databricks workspace (premium, optional) | Training workspace — new workspaces get a **14-day free DBU trial** |
-| UC storage credential + external location + grants (optional) | `LOCATION`-based exercises for the `dea-training` group |
+| UC storage credential + external location + grants (optional) | `LOCATION`-based exercises for the training group (`alt_trn_gr`, same as `TRAINING_GROUP` in `00_pre_config`) |
 | Azure SQL server + `AdventureWorksLT` DB (serverless `GP_S_Gen5_1`) | Lakeflow Connect CDC source (demo `02a_lakeflow_connect_demo`) |
 
 > ### ⚠️ WARNING — shared subscription
@@ -22,7 +22,7 @@ Provisions everything the 3-day Databricks Data Engineer Associate training need
 - Azure roles for the deploying identity:
   - **Contributor** — to create resources, **and**
   - **User Access Administrator** (or Owner) — the access-connector role assignment fails without it.
-- For the Unity Catalog part (`configure_uc = true`): the same `az login` identity must be a **workspace admin** on the target workspace, and the `training_group` (default `dea-training`) must already exist there.
+- For the Unity Catalog part (`configure_uc = true`): the same `az login` identity must be a **workspace admin** on the target workspace, and the `training_group` (default `alt_trn_gr`) must already exist there.
 - **Do NOT create a metastore.** On Azure, Databricks auto-provisions one Unity Catalog metastore per region and attaches new workspaces automatically. This config only adds a storage credential + external location on top.
 
 ## Quickstart
@@ -37,14 +37,25 @@ terraform apply
 
 Fresh-workspace tip: the UC objects need the workspace to exist and you to be its admin. If the first full apply trips on the Databricks provider, run once with `configure_uc = false`, open the workspace URL (which makes your identity the first admin), then set `configure_uc = true` and apply again.
 
-**Post-deploy — enable CDC** (values from `terraform output`):
+If the default `az account` belongs to another tenant, the `azure-cli` auth of the Databricks provider picks the wrong identity (AADSTS50020). Use an AAD token instead:
 
 ```bash
+export ARM_SUBSCRIPTION_ID=<subscription-id>
+export DATABRICKS_TOKEN=$(az account get-access-token --subscription $ARM_SUBSCRIPTION_ID \
+       --resource 2ff814a6-3304-4ab8-85cb-cd0e6f879c1d --query accessToken -o tsv)
+terraform apply -var databricks_auth_type=pat
+```
+
+**Post-deploy — enable CDC** (values from `terraform output`). Two scripts, in this order — the first one runs against **master**:
+
+```bash
+sqlcmd -S $(terraform output -raw sql_server_fqdn) -d master \
+       -U deatrainer -P '<sql_admin_password>' -i ../sql/create_login_master.sql
 sqlcmd -S $(terraform output -raw sql_server_fqdn) -d AdventureWorksLT \
        -U deatrainer -P '<sql_admin_password>' -i ../sql/enable_cdc.sql
 ```
 
-Edit the `lakeflow_connect` placeholder password in the script first — that user (not the admin) goes into the Databricks connection.
+Edit the `lakeflow_connect` placeholder password in `create_login_master.sql` first — that login (not the admin) goes into the Databricks connection. On Azure SQL Database it must be a server login: the connector needs the `##MS_DatabaseConnector##` server role.
 
 **Lakeflow Connect UI steps** (summary; details in `notebooks/day1/demo/02a_lakeflow_connect_demo.ipynb`):
 
@@ -84,7 +95,7 @@ Everything lives in `rg-<prefix>-training` (plus the workspace's managed RG, del
 | `AuthorizationFailed` creating the role assignment | Deploying identity lacks User Access Administrator/Owner. Have an admin grant it, or ask them to create the role assignment manually and `terraform import` it |
 | Databricks provider `cannot configure azure-cli auth` / 403 on UC resources | `az login` identity is not a workspace admin, or the workspace was never opened (first login bootstraps the admin). Open the workspace URL once; or two-phase apply (`configure_uc = false` → `true`) |
 | `storage credential ... metastore not found` | Workspace not attached to a metastore. Azure auto-attaches in supported regions on first login; check **Catalog** in the UI. Do not create a metastore via Terraform |
-| `databricks_grants`: principal `dea-training` not found | Create the group first (workspace admin settings → Identity and access → Groups) or change `training_group` |
+| `databricks_grants`: principal `alt_trn_gr` not found | Create the group first (workspace admin settings → Identity and access → Groups) or change `training_group` |
 | Storage account / SQL server name taken | Names include a random suffix, so rare — `terraform taint random_string.suffix` and re-apply for a new suffix |
 | `sp_cdc_enable_db` fails / not supported | DB below 1 vCore / S3 tier (someone changed the SKU), or you connected to `master`. Use `-d AdventureWorksLT`; keep `GP_S_Gen5_1`; or switch to the Change Tracking block in the script |
 | `sqlcmd` login timeout | Your public IP is not in `trainer_ip_cidrs` (`curl -s ifconfig.me`, add, re-apply), or the serverless DB is resuming from pause — retry after ~1 min |

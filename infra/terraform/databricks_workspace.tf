@@ -13,8 +13,10 @@ resource "azurerm_databricks_workspace" "this" {
   name                = local.workspace_name
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
-  # Premium is required for Unity Catalog; covered by the 14-day trial.
-  sku                         = "premium"
+  # "trial" = Premium features (Unity Catalog) with 14-day free DBUs.
+  # "premium" does NOT start the free trial. Flip to "premium" in place if the
+  # workspace must outlive the trial window.
+  sku                         = "trial"
   managed_resource_group_name = local.managed_rg_name
 
   tags = local.common_tags

@@ -22,7 +22,7 @@ create_workspace = true
 # Tip for a brand-new workspace: run a first apply with configure_uc = false,
 # then flip to true and apply again.
 configure_uc   = true
-training_group = "dea-training"
+training_group = "alt_trn_gr" # same as TRAINING_GROUP in notebooks/setup/00_pre_config.ipynb
 
 # --- Azure SQL (Lakeflow Connect CDC source) ---------------------------------
 sql_admin_login = "deatrainer"

@@ -64,10 +64,16 @@ variable "configure_uc" {
   default     = true
 }
 
+variable "databricks_auth_type" {
+  description = "Auth for the workspace-level Databricks provider. \"azure-cli\" (default) uses the `az login` identity. Use \"pat\" with DATABRICKS_TOKEN set to an AAD token (`az account get-access-token --subscription <id> --resource 2ff814a6-3304-4ab8-85cb-cd0e6f879c1d`) when the default az account belongs to another tenant."
+  type        = string
+  default     = "azure-cli"
+}
+
 variable "training_group" {
   description = "Databricks account/workspace group that receives ALL PRIVILEGES on the external location. Must already exist in the workspace."
   type        = string
-  default     = "dea-training"
+  default     = "alt_trn_gr"
 }
 
 # ---------------------------------------------------------------------------

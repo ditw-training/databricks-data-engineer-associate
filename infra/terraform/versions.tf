@@ -32,5 +32,8 @@ provider "azurerm" {
 provider "databricks" {
   alias     = "workspace"
   host      = local.databricks_host
-  auth_type = "azure-cli"
+  auth_type = var.databricks_auth_type
+  # Pins the az token to the workspace's subscription/tenant, so it works even
+  # when the default `az account` points at another subscription.
+  azure_workspace_resource_id = local.workspace_id
 }
