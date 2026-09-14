@@ -1,0 +1,107 @@
+# =============================================================================
+# env_demo — ONE bundle, THREE environments (dev / test / prod)
+# =============================================================================
+# Trainer demo for module 09 (see notebooks/day3/demo/09a_dabs_environments.ipynb).
+# The same job definition is deployed to every target; only the VALUES change:
+#
+#                     dev                     test                        prod
+#   mode              development             production                  production
+#   name              [dev <user>] env_demo   [test] env_demo             env_demo
+#   root_path         .bundle/env_demo/dev    .bundle/env_demo/test       .bundle/env_demo/prod
+#   schema            dev_env_demo            test_env_demo               prod_env_demo
+#   schedule          paused (dev mode)       PAUSED (variable)           UNPAUSED (variable)
+#
+# Commands (run from materials/cicd_environments/):
+#   databricks bundle validate -t dev  --var="catalog=retailhub_<slug>"
+#   databricks bundle summary  -t test --var="catalog=retailhub_<slug>"
+#   databricks bundle deploy   -t dev  --var="catalog=retailhub_<slug>"
+#   databricks bundle run      -t dev  --var="catalog=retailhub_<slug>" env_demo_job
+#   databricks bundle destroy  -t dev  --var="catalog=retailhub_<slug>" --auto-approve
+# =============================================================================
+
+bundle:
+  name: env_demo
+
+include:
+  - resources/*.yml
+
+# -----------------------------------------------------------------------------
+# Variables = the knobs that differ between environments.
+# Precedence (highest first): --var on the CLI  >  BUNDLE_VAR_<name> env var
+#                             >  targets.<t>.variables  >  default below
+# -----------------------------------------------------------------------------
+variables:
+  catalog:
+    description: "Unity Catalog to write to (training: your retailhub_<slug> catalog)."
+    default: retailhub_trainer
+  env_name:
+    description: "Human-readable environment label, passed to the job as a parameter."
+    default: dev
+  schema:
+    description: "Schema that receives the demo table (created by the job if missing)."
+    default: dev_env_demo
+  schedule_pause_status:
+    description: "PAUSED or UNPAUSED — whether the nightly schedule is active."
+    default: PAUSED
+  min_rows:
+    description: "Data-quality threshold — stricter in production."
+    default: "1"
+
+targets:
+  # ---------------------------------------------------------------------------
+  # dev — personal sandbox. mode: development
+  #   * prefixes every resource name with "[dev <user_name>]"
+  #   * pauses all schedules/triggers regardless of the variable
+  #   * deploys under /Workspace/Users/<you>/.bundle/env_demo/dev
+  # ---------------------------------------------------------------------------
+  dev:
+    mode: development
+    default: true
+    variables:
+      env_name: dev
+      schema: dev_env_demo
+      schedule_pause_status: PAUSED
+      min_rows: "1"
+
+  # ---------------------------------------------------------------------------
+  # test — shared, production-like. mode: production + a visible name prefix
+  # ---------------------------------------------------------------------------
+  test:
+    mode: production
+    workspace:
+      # Restricted folder. /Workspace/Shared would be writable by ALL users (validate warns about it);
+      # in real projects this is the service principal's home folder.
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
+    presets:
+      name_prefix: "[test] "
+      tags:
+        environment: test
+    variables:
+      env_name: test
+      schema: test_env_demo
+      schedule_pause_status: PAUSED
+      min_rows: "100"
+
+  # ---------------------------------------------------------------------------
+  # prod — mode: production, schedule active, no name prefix.
+  # In a real project prod is deployed by CI/CD with a service principal
+  # (run_as) and usually lives in a separate workspace (workspace.host).
+  # Training: VALIDATE / SUMMARY only — do not deploy (the schedule is UNPAUSED).
+  # ---------------------------------------------------------------------------
+  prod:
+    mode: production
+    workspace:
+      # Restricted folder. /Workspace/Shared would be writable by ALL users (validate warns about it);
+      # in real projects this is the service principal's home folder.
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
+      # host: https://adb-<prod-workspace>.azuredatabricks.net   # separate prod workspace
+    presets:
+      tags:
+        environment: prod
+    variables:
+      env_name: prod
+      schema: prod_env_demo
+      schedule_pause_status: UNPAUSED
+      min_rows: "1000"
+    # run_as:
+    #   service_principal_name: "00000000-0000-0000-0000-000000000000"

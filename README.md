@@ -33,7 +33,7 @@ Exam guide version: **May 4, 2026** (re-check the official guide ~2 weeks before
 |-----|-------|------|-------|
 | **Day 1** | 00, 01, 02, 02a, 03 | lab_01, lab_02, lab_03 | Platform & UC, ingestion, **Lakeflow Connect (live demo)**, Delta Lake |
 | **Day 2** | 04, 05, 06, 07 | lab_04, lab_05, lab_07 | Optimization, incremental ingestion (Auto Loader), medallion, Lakeflow Spark Declarative Pipelines |
-| **Day 3** | 08, 09, 10, 11 | lab_08, lab_09, lab_troubleshooting, lab_10 | Lakeflow Jobs, CI/CD & bundles, troubleshooting, governance, exam prep |
+| **Day 3** | 08, 09 (+09a), 10, 11 | lab_08, lab_09, lab_troubleshooting, lab_10 | Lakeflow Jobs, CI/CD & bundles, troubleshooting, governance, exam prep |
 | **Self-study** | 05a | lab_06 | Transformations & modeling (exam domain 3, 22%) — 10-minute briefing on Day 2, work through after class |
 
 The full timed agenda lives in `notebooks/day1/demo/00_intro.ipynb` and `docs/INSTRUCTOR_GUIDE.md`.
@@ -58,6 +58,7 @@ The full timed agenda lives in `notebooks/day1/demo/00_intro.ipynb` and `docs/IN
 | 07 | Lakeflow Spark Declarative Pipelines | `notebooks/day2/demo/07_lakeflow_pipelines.ipynb` |
 | 08 | Lakeflow Jobs — Orchestration | `notebooks/day3/demo/08_job_orchestration.ipynb` |
 | 09 | CI/CD & Declarative Automation Bundles | `notebooks/day3/demo/09_cicd_and_automation.ipynb` |
+| 09a | DABs per environment — one bundle, dev / test / prod targets (trainer demo) | `notebooks/day3/demo/09a_dabs_environments.ipynb` + `materials/cicd_environments/` |
 | 10 | Governance & Security (incl. ABAC) | `notebooks/day3/demo/10_governance_and_security.ipynb` |
 | 11 | Exam Preparation | `notebooks/day3/demo/11_exam_preparation.ipynb` |
 | BT | Bonus: Troubleshooting Reference (Spark UI, failures) | `notebooks/day3/demo/BONUS_troubleshooting.ipynb` |

@@ -57,7 +57,7 @@ Example grid 09:00–16:00 with breaks 15' + 30' lunch + 15'. Shift break times 
 | 09:10–09:55 | 45' | Lakeflow Jobs: task types, DAG, triggers, retries, if/else, `for_each`, parameters & task values, run history | `08_job_orchestration` |
 | 09:55–10:50 | 55' | **Lab 08** — multi-task job (Section 1 + Tasks A–E) | `day3/lab/lab_08` |
 | 10:50–11:05 | — | *Break* | |
-| 11:05–11:35 | 30' | CI/CD: Git folders flow, Declarative Automation Bundles, variables & targets, CLI | `09_cicd_and_automation` + `materials/cicd` |
+| 11:05–11:35 | 30' | CI/CD: Git folders flow, Declarative Automation Bundles, variables & targets, CLI | `09_cicd_and_automation` + `materials/cicd`; per-environment deploy demo `09a_dabs_environments` + `materials/cicd_environments` (dev/test deploy, prod validate only — ~15–20' of this block) |
 | 11:35–12:10 | 35' | **Lab 09** — deploy RetailHub as a bundle (incl. Git folder step) | `day3/lab/lab_09_dabs` |
 | 12:10–12:40 | — | *Lunch* | |
 | 12:40–13:15 | 35' | **Troubleshooting exercise** — broken job (Tasks 1–5) | `day3/lab/lab_troubleshooting` + `materials/troubleshooting` |
