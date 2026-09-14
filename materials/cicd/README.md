@@ -47,8 +47,9 @@ Key concepts to point at while reading `databricks.yml`:
 
 ## Prerequisites
 
-- Databricks CLI **v0.230+** (`databricks --version`) — the new Go CLI, not the
-  legacy `databricks-cli` pip package.
+- The current Databricks CLI (`databricks --version`) — the new Go CLI, not the
+  legacy `databricks-cli` pip package. This bundle was tested with Databricks CLI
+  **v1.16.1**.
 - Authentication configured (below).
 - Your personal training catalog exists (`retailhub_<slug>` from `00_pre_config`).
 
@@ -63,7 +64,9 @@ databricks auth describe --profile TRAINING
 ```
 
 Then either pass `-p TRAINING` on every command or `export DATABRICKS_CONFIG_PROFILE=TRAINING`.
-In the **workspace web terminal** authentication is inherited — no profile needed.
+If your workspace offers the **web terminal**, authentication there is normally
+inherited — no profile needed (not verified on the serverless-first training workspace;
+the local CLI with a profile is the tested path).
 
 ## Commands
 
@@ -88,7 +91,8 @@ databricks bundle destroy -t dev --var="catalog=retailhub_<your_slug>"
 
 With `-t dev` (`mode: development`) the deployed resources are named
 **`[dev <your user name>] retailhub_job`** / **`[dev <your user name>] retailhub_pipeline`**,
-schedules and triggers are paused, and files land under
+any schedule or trigger would be paused (`retailhub_job` declares none — its
+schedule is commented out), and files land under
 `/Workspace/Users/<you>/.bundle/retailhub/dev/`. Every participant can therefore
 deploy their own isolated copy of the same code.
 
