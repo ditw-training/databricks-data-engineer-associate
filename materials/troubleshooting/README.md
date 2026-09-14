@@ -5,7 +5,7 @@ deliberately broken task notebooks (Databricks source format):
 
 | Task | File | Planted faults |
 |---|---|---|
-| 1 `ingest` | `task_ingest.py` | Wrong Volume path (`.../dataset/...` instead of `.../datasets/...`) → `PATH_NOT_FOUND`; after the path is fixed, the reader schema names two fields wrong (`client_id`, `amount_total` vs source `customer_id`, `total_amount`) → all-NULL columns → quality gate raises |
+| 1 `ingest` | `task_ingest.py` | Wrong Volume path (`.../dataset/...` instead of `.../datasets/...`) → `UC_VOLUME_NOT_FOUND` (Volume `<catalog>.default.dataset` does not exist; a wrong folder *inside* an existing Volume would give `PATH_NOT_FOUND`); after the path is fixed, the reader schema names two fields wrong (`client_id`, `amount_total` vs source `customer_id`, `total_amount`) → all-NULL columns → quality gate raises |
 | 2 `transform` | `task_transform.py` | Join on `left(customer_id, 8)` — a low-cardinality truncated key → ~100× row explosion visible in shuffle/output-row metrics; `spark.sql.shuffle.partitions = 4000` → thousands of tiny tasks |
 | 3 `publish` | `task_publish.py` | Reads `silver.ts_orders_final`, a table no upstream task creates (transform writes `ts_orders_enriched`); in the job DAG it depends only on `ingest`, not `transform` |
 
@@ -20,7 +20,7 @@ deliberately broken task notebooks (Databricks source format):
    - `publish` → notebook `task_publish`, **depends on `ingest` only**
      (this wrong edge is part of the exercise — do NOT wire it to `transform`)
 3. Run the job once so a failed run exists in the run history: `ingest` fails
-   on `PATH_NOT_FOUND`, `transform`/`publish` are skipped (upstream failed).
+   on `UC_VOLUME_NOT_FOUND`, `transform`/`publish` are skipped (upstream failed).
 4. Grant participants **CAN VIEW** on the job so they can open the run
    history, the DAG, and the task error details.
 
