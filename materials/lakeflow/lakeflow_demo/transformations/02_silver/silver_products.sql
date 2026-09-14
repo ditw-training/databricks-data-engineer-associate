@@ -15,9 +15,12 @@ WITH base AS (
       WHEN UPPER(status) IN ('ACTIVE', 'AVAILABLE') THEN 1 
       ELSE 0 
     END AS is_active,
-    0 AS is_unknown
-    --,row_number() OVER(PARTITION BY product_id ORDER BY ingestion_ts desc) AS rn
+    0 AS is_unknown,
+    -- products.parquet contains duplicated product_ids: keep ONE row per key,
+    -- otherwise every join to dim_product multiplies fact rows
+    row_number() OVER (PARTITION BY product_id ORDER BY ingestion_ts DESC, product_name) AS rn
   FROM bronze_products
+  WHERE product_id IS NOT NULL
 )
 SELECT
   product_id,
@@ -31,7 +34,7 @@ SELECT
   is_active,
   is_unknown
 FROM base
---where rn = 1
+WHERE rn = 1
 
 UNION ALL
 

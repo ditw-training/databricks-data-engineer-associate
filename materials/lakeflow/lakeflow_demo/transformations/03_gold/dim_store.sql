@@ -11,8 +11,9 @@ SELECT
 FROM (
   SELECT DISTINCT store_id
   FROM silver_orders
-  
-  UNION ALL
-  
+
+  -- UNION (not UNION ALL) keeps store_id unique even if 'UNKNOWN' exists in the data
+  UNION
+
   SELECT 'UNKNOWN' AS store_id
 );
