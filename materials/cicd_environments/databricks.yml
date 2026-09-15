@@ -9,7 +9,7 @@
 #   name              [dev <user>] env_demo   [test] env_demo             env_demo
 #   root_path         .bundle/env_demo/dev    .bundle/env_demo/test       .bundle/env_demo/prod
 #   schema            dev_env_demo            test_env_demo               prod_env_demo
-#   schedule          paused (dev mode)       PAUSED (variable)           UNPAUSED (variable)
+#   schedule          PAUSED (variable)       PAUSED (variable)           UNPAUSED (variable)
 #
 # Commands (run from materials/cicd_environments/):
 #   databricks bundle validate -t dev  --var="catalog=retailhub_<slug>"
@@ -51,7 +51,9 @@ targets:
   # ---------------------------------------------------------------------------
   # dev — personal sandbox. mode: development
   #   * prefixes every resource name with "[dev <user_name>]"
-  #   * pauses all schedules/triggers regardless of the variable
+  #   * pauses schedules/triggers by default — but an explicit pause_status on a
+  #     resource overrides that preset. env_demo_job sets pause_status from
+  #     ${var.schedule_pause_status}, so dev is PAUSED because of the value below.
   #   * deploys under /Workspace/Users/<you>/.bundle/env_demo/dev
   # ---------------------------------------------------------------------------
   dev:

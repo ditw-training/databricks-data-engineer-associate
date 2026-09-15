@@ -6,7 +6,7 @@ Training materials for the **Databricks Certified Data Engineer Associate** cert
 
 **3 days** | ~50% hands-on
 
-Exam: **45 scored questions, 90 minutes, $200.** Passing score is **not published** (set statistically by Databricks) — aim for ≥80% on practice quizzes. PySpark-dominant, with SQL for ingestion, DDL and governance.
+Exam: **45 scored questions, 90 minutes, $200.** Passing score is **not published** (set statistically by Databricks) — aim for ≥80% on practice quizzes. SQL and Python (PySpark) — SQL where possible.
 Exam guide version: **May 4, 2026** (re-check the official guide ~2 weeks before your exam date — it is revised every 4–6 months).
 
 ---

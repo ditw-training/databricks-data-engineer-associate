@@ -23,8 +23,9 @@ resources:
         bundle: ${bundle.name}
         target: ${bundle.target}
 
-      # Nightly schedule — active only where the target sets UNPAUSED
-      # (development mode pauses it anyway).
+      # Nightly schedule — active only where the target sets UNPAUSED.
+      # Development mode pauses schedules only by default: this explicit
+      # pause_status overrides that preset, so the variable decides in every target.
       schedule:
         quartz_cron_expression: "0 0 2 * * ?"
         timezone_id: Europe/Warsaw

@@ -104,15 +104,28 @@ Sections below are marked **⏭️ Self-study** in the notebooks. None of them i
 - **lab_01:** serverless-first; classic-cluster creation is YOUR demo only. If someone lacks serverless, pair them up rather than debugging entitlements live.
 - **lab_02:** contains an intentional bug-hunt bonus. Solutions in `notebooks/solution/`.
 - **lab_05 / dataset quirk (teachable, not a bug):** `orders/stream/orders_stream_001.json` is byte-identical to the first 10k rows of `orders_batch.json`, and key `ORD00030000` repeats between stream_003/004 with a different payload. Use it to provoke the "why does my count differ?" discussion → dedup/MERGE motivation (picked up again in the self-study lab_06 window-dedup task).
-- **lab_07:** the ~3% intentional nulls in `orders_batch.json` feed the expectations/quarantine task. Stagger pipeline starts (3–4 participants at a time) to avoid a serverless DBU burst.
+- **lab_07:** the intentional nulls in `orders_batch.json` (null `order_id` ~3% + null `customer_id` ~3% → silver drops ~6%) feed the expectations/quarantine task. Stagger pipeline starts (3–4 participants at a time) to avoid a serverless DBU burst.
 - **Module 07 demos:** three levels — DEMO 1 `lakeflow_step_by_step` (build from scratch: checkpoints → SCD1/SCD2 → MV → expectations; run its `00_demo_driver.py` between updates; the FAIL step really fails the update — time-box ~3 min), DEMO 2 = `lakeflow_demo` (the LAB 07 stack), DEMO 3 `lakeflow_metadata_driven` (config table → dynamic graph; run `00_create_config_table.py` first; the "add a config row live" cell is the wow-moment; label it *beyond exam*). DEMO 3 is homework / fast-finisher material in the 360' plan — it does not gate any lab. Each folder's README has the walkthrough script.
-- **lab_08:** the break-and-repair task needs YOU to set the failing parameter — instructions inside the lab.
+- **lab_08:** the break-and-repair task (Task D) breaks `gold_summary` by changing its notebook path, then restores it and uses **Repair run** — instructions inside the lab.
 - **lab_09:** primary path = web terminal / local CLI; fallback = trainer-driven deploy on the projector with participants editing YAML + verifying via SDK cells. Decide the morning of Day 3 based on the smoke test.
 - **lab_troubleshooting:** create the 3-task job from `materials/troubleshooting/broken_job/` before the block (or let a fast participant do it). Faults: wrong volume path (task 1), exploding join + absurd shuffle partitions (task 2), missing dependency (task 3).
 - **lab_07 in 45' (Day 2):** Section 1 + Tasks 1–5; show the Task 7 quarantine count yourself at the debrief. Start the pipelines before the Day-2 quiz if they are still running. **lab_08 (55') and lab_10 (40')** run in full on Day 3.
 - **lab_10:** ABAC policy creation usually needs privileges participants don't have — keep it as your demo; participants do masks/row filters directly.
 - **Quizzes:** answer keys are embedded at the bottom of each quiz — display only the question part when projecting. The Day-3 quiz (28 Q, PDF Q41–68) has no agenda slot — use it as homework or during exam prep.
 - **Participant PDFs** (`docs/ENG/`, `docs/PL/` — hand out the language the group prefers): cheatsheet and `pyspark_vs_sparksql` on Day 1; `external_connection_guide` and `lakeflow_connect_sqlserver_guide` with the ADLS / Lakeflow Connect blocks; quiz, `exam_objectives_map` and `next_steps` at the end of Day 3. The quiz PDF contains the answer key on its last page. Rebuild after editing sources: `./scripts/build_pdfs.sh`.
+
+## 2a. Dataset quirks & talking points (verified on the delivery workspace, 2026-09-15)
+
+Not bugs to fix in class — expect the questions and use them as data-quality discussions.
+
+- **`customers.csv`:** the `city` column holds US **state names** (Ohio, Texas, …) while `customers_new.csv` uses real cities (Austin, Seattle); 266 rows have an empty `customer_id`; 265 `customer_id`s are **duplicated** (e.g. `CUST000007` twice → MERGE in lab_03 updates both rows, 5 Austin rows); 45 customers have a `registration_date` **in the future** (negative `days_since_registration` if someone sorts). `nullable=False` in a reader schema is ignored by file sources (printSchema shows `true`).
+- **`orders_batch.json`:** ~3% null `order_id`, ~3% null `customer_id`, 3,096 orphan orders (`CUST999999`), ~3,000 rows dated 2026-02 (future-dated outliers in monthly aggregates), duplicate `order_id`s inside the file; sales ids in the synthetic demo tables of module 04 use a different format (`CUST0038`) than `bronze.customers` (`CUST000038`).
+- **Inner join loss (lab_06):** ~9% of orders — null keys + orphans + orders of customers without an id.
+- **Serverless specifics participants notice:** no Spark UI (use *See performance → Query profile*); `spark.sql.shuffle.partitions` shows `auto`; many `spark.conf.set` calls are rejected; benchmark timings on small data are noise (caching, AQE, broadcast chosen automatically).
+- **VACUUM on UC managed tables:** time travel after `VACUUM RETAIN 0 HOURS` is rejected by the `delta.deletedFileRetentionDuration` guard; physical file deletion can be deferred, so old files may still be readable if the property is unset — don't promise a file-not-found error.
+- **System tables (`system.lakeflow.*`) are account-wide:** you will see runs from other workspaces/trainings unless filtered by `workspace_id`; job names come from `system.lakeflow.jobs`, not `run_name`.
+- **Shared metastore:** `SHOW SHARES` / catalogs from other trainings (e.g. `retailhub_student5xx`) may be visible — explain workspace vs metastore scope.
+- **Wording that may be challenged:** GPU is available on serverless nowadays; `TEMPORARY` tables/views in pipelines are now called `PRIVATE`; `hasTagValue` → `has_tag_value` (snake_case) in ABAC.
 
 ## 3. Known risks & fallbacks
 

@@ -62,7 +62,7 @@ targets:
   # prod — stub for the discussion "what changes between dev and prod?".
   # NOT used during the training. In production you would typically:
   #   * switch mode to production (no name prefix, triggers stay active)
-  #   * deploy to a shared root_path, not a user home folder
+  #   * deploy to a restricted root_path — never /Workspace/Shared (writable by all users)
   #   * run as a service principal (run_as), not a personal identity
   #   * override variables per environment (catalog: retailhub_prod)
   # ---------------------------------------------------------------------------
@@ -70,7 +70,8 @@ targets:
   #   mode: production
   #   workspace:
   #     host: https://adb-XXXXXXXXXXXXXXXX.XX.azuredatabricks.net
-  #     root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
+  #     # in real projects: the service principal's folder (run_as)
+  #     root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
   #   variables:
   #     catalog: retailhub_prod
   #   run_as:

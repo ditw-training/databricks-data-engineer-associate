@@ -18,7 +18,7 @@ environment-specific value coming from **targets + variables**.
 | job name | `[dev <user>] env_demo_job` | `[test] env_demo_job` | `env_demo_job` |
 | `root_path` | `.bundle/env_demo/dev` (user home) | `.bundle/env_demo/test` (user home) | `.bundle/env_demo/prod` (user home; SP home in real life) |
 | schema | `dev_env_demo` | `test_env_demo` | `prod_env_demo` |
-| schedule | PAUSED (dev mode) | PAUSED | **UNPAUSED** |
+| schedule | PAUSED (variable — an explicit `pause_status` overrides the dev-mode default) | PAUSED | **UNPAUSED** |
 | `min_rows` | 1 | 100 | 1000 |
 
 ## Demo script (from this folder)
