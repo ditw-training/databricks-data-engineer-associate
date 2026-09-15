@@ -23,8 +23,9 @@ derby.log
 metastore_db/
 spark-warehouse/
 
-# Training utilities (local only)
+# Training utilities & build scripts (local only)
 utilization/
+scripts/
 *.zip
 
 # PDF build workspace (scripts/build_pdfs.sh)
@@ -32,3 +33,25 @@ utilization/
 
 # Agent working notes (local only)
 .agents/
+
+# Local-only secrets / credentials (participant logins etc.)
+.private/
+
+# Databricks CLI / bundle deployment state, IDE extension state
+.databricks/
+
+# Claude Code local state
+.claude/
+
+# Presentation sources (slide deck is maintained outside the repo)
+presentation/
+*.pptx
+
+# Terraform state & variables anywhere in the repo (infra/terraform has its own .gitignore too)
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+
+# Logs
+*.log

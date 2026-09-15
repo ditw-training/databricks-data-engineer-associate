@@ -150,7 +150,7 @@ Sources are Markdown files in `utilization/en/` and `utilization/pl/` (local onl
 │   ├── orchestration/                 # Job task scripts (triggers, task values)
 │   ├── cicd/                          # Declarative Automation Bundle (databricks.yml + resources)
 │   └── troubleshooting/broken_job/    # Deliberately broken tasks for lab_troubleshooting
-├── scripts/build_pdfs.sh              # Markdown → PDF build (pandoc + WeasyPrint)
+├── scripts/build_pdfs.sh              # Markdown → PDF build (pandoc + WeasyPrint) — local only, git-ignored
 └── notebooks/
     ├── setup/                         # 00_pre_config (trainer) + 00_setup (%run)
     ├── day1/{demo,lab}/               # 00–03 + 02a | lab_01–lab_03
