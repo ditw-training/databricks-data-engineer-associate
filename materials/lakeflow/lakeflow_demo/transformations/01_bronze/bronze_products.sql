@@ -1,4 +1,4 @@
-CREATE OR REPLACE MATERIALIZED VIEW bronze_products
+CREATE OR REFRESH MATERIALIZED VIEW bronze_products
 AS
 SELECT
   product_id,

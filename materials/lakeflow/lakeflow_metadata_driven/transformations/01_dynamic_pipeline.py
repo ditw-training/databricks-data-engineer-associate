@@ -45,11 +45,15 @@ def make_bronze(cfg):
             spark.readStream.format("cloudFiles")
             .option("cloudFiles.format", cfg["source_format"])
             .option("cloudFiles.inferColumnTypes", "true")
+            .option("cloudFiles.useStrictGlobber", "true")  # '*' must not cross '/' (no sub-folders)
         )
         if cfg["source_format"] == "csv":
             reader = reader.option("header", "true")
+        # Glob = only files of THIS format directly in THIS folder (strict globber above).
+        # Without it Auto Loader walks the folder recursively and also picks up other formats
+        # (products.parquet/, customers_extented.xlsx) and sub-folders (orders/stream/ is its own entity).
         return (
-            reader.load(f"{SOURCE_PATH}/{cfg['source_subdir']}")
+            reader.load(f"{SOURCE_PATH}/{cfg['source_subdir']}/*.{cfg['source_format']}")
             .withColumn("_ingest_ts", F.col("_metadata.file_modification_time"))
             .withColumn("_ingest_file", F.col("_metadata.file_name"))
         )

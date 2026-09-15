@@ -21,5 +21,7 @@ FROM STREAM read_files(
   '${customer_path}',
   format           => 'csv',
   header           => true,
-  inferColumnTypes => true
+  inferColumnTypes => true,
+  -- the customers folder also holds customers_extented.xlsx: read only CSV files
+  fileNamePattern  => '*.csv'
 );

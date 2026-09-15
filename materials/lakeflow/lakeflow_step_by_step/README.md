@@ -33,15 +33,15 @@ incremental file ingestion + checkpoints → AUTO CDC (SCD1 vs SCD2) → gold MV
 | 3 | **Run pipeline again without new files** | **0 rows processed** — this is the checkpoint story: every streaming table/flow keeps its own checkpoint in pipeline-managed storage; already-seen files are never reprocessed. Full refresh = reset checkpoint + rebuild. |
 | 4 | Driver **Step 2** (copies wave 2), run pipeline | Only the NEW files' rows are ingested. Show `DESCRIBE HISTORY` + the update's "streaming update" metrics. |
 | 5 | Add `02_silver_customers_scd.py`, run | Two silver tables from one CDC feed: **SCD1** (overwrite in place) vs **SCD2** (`__START_AT`/`__END_AT` history columns). |
-| 6 | Driver **Step 3** (copies `customers_new.csv` — 15 changed customers), run pipeline, then driver **Step 4** (compare SCD1 vs SCD2 for `CUST000001`) | SCD1: city simply changed. SCD2: old row closed (`__END_AT` set), new current row opened. |
+| 6 | Driver **Step 3** (copies `customers_new.csv` — 14 rows: 7 existing customers with changed attributes, 6 new customers, 1 unchanged), run pipeline, then driver **Step 4** (compare SCD1 vs SCD2 for `CUST000001`) | SCD1: city simply changed. SCD2: old row closed (`__END_AT` set), new current row opened. |
 | 7 | Add `03_gold_daily_sales.sql`, run | MV recomputes from silver — contrast **ST (incremental, append-driven)** vs **MV (recomputed result, may refresh incrementally when possible)**. |
-| 8 | Add `04_expectations.py`, run | `expect_or_drop` silently filters ~3% dirty rows — show the **data quality** tab / event log metrics. Then UNCOMMENT the `expect_or_fail` block, run → pipeline **fails** (show the error surface), re-comment, run again. |
+| 8 | Add `04_expectations.py`, run | `expect_all_or_drop` silently filters the dirty rows — 4 rules × ~3% each ≈ **12%** of bronze (verified: 3,603 of 30,000) — show the **data quality** tab / event log metrics. Then UNCOMMENT the `expect_or_fail` line and run with **Full refresh** of `silver_orders_checked` (pipeline editor: select the table → *Run* ▸ *Full refresh selection*) → the update **FAILS** on the 1,827 returns (negative `total_amount`). A plain run does **not** fail: the streaming table only checks NEW rows and there are none. Show the error surface, re-comment, full-refresh the table again. |
 | 9 | Add `05_quarantine.py`, run | Production pattern: don't lose dropped rows — route them to a quarantine table with the inverse predicate; show counts add up (valid + quarantined = bronze). |
 | 10 | Driver **Step 5** — event log queries | `event_log(TABLE(...))` → expectations metrics per update; this is what you monitor in production. |
 
 ## Teaching notes
 
 - Keep **development mode ON** → cluster reuse, no retries — fast iteration during the demo.
-- The FAIL step really fails the update — that is the point; keep it short.
+- The FAIL step really fails the update — only with a **full refresh** of `silver_orders_checked` (a normal run has no new rows to check); keep it short.
 - If short on time, cut step 9 (quarantine) — it is repeated in LAB 07's Task 7.
 - Everything here lands in schema `sdp_demo`, so it never collides with the LAB 07 pipeline (`lakeflow_demo`).

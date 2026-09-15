@@ -2,13 +2,15 @@
 # STAGE 4 — EXPECTATIONS: warn -> DROP ROW -> FAIL UPDATE
 # =====================================================================
 # DEMO SCRIPT:
-#   Run A: as-is -> @dp.expect_all_or_drop removes the ~3% dirty rows
-#          (NULL ids/timestamps). Show the pipeline's data-quality metrics
-#          and compare counts vs bronze.
-#   Run B: UNCOMMENT the expect_or_fail block below and run again ->
-#          the update FAILS on the amount rule. Show the error in the UI,
+#   Run A: as-is -> @dp.expect_all_or_drop removes the dirty rows: 4 rules x ~3%
+#          each = ~12% of bronze (NULL ids/timestamps/payment). Show the
+#          pipeline's data-quality metrics and compare counts vs bronze.
+#   Run B: UNCOMMENT the expect_or_fail line below and run with a FULL REFRESH
+#          of silver_orders_checked -> the update FAILS on the amount rule
+#          (1,827 returns have total_amount < 0). A plain run does NOT fail:
+#          a streaming table only checks NEW rows, and there are none. Show the error in the UI,
 #          explain when to fail-fast (contract violations, financial data),
-#          then RE-COMMENT and run once more.
+#          then RE-COMMENT and full-refresh silver_orders_checked once more.
 #   Modes recap:
 #     @dp.expect(...)              -> keep row, only METRIC (warn)
 #     @dp.expect_all_or_drop({...})-> drop bad rows silently (metrics kept)

@@ -66,7 +66,7 @@ display(spark.sql(f"""
 
 # MAGIC %md
 # MAGIC ## Step 3 — CDC feed: changed customers
-# MAGIC `customers_new.csv` contains 15 customers with CHANGED attributes (e.g. `CUST000001` moved New York → Seattle).
+# MAGIC `customers_new.csv` has 14 rows: 7 existing customers with CHANGED attributes (e.g. `CUST000001` moved New York → Seattle), 6 new customers and 1 unchanged row.
 # MAGIC The file's modification time becomes the CDC **sequence** — AUTO CDC orders events by it.
 
 # COMMAND ----------

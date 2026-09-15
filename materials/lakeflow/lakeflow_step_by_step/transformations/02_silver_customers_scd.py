@@ -4,14 +4,14 @@
 # DEMO SCRIPT:
 #   - The CDC "feed" is the customers landing folder: first the full
 #     snapshot (customers_000_initial.csv), later a change file
-#     (customers_001_changes.csv, 15 modified customers).
+#     (customers_001_changes.csv: 14 rows = 7 changed + 6 new customers + 1 unchanged).
 #   - sequence_by = file modification time -> AUTO CDC orders events and
 #     handles late/duplicate events per key.
 #   - ONE source feeds TWO targets:
 #       * silver_customers_scd1 -> latest value wins, no history
 #       * silver_customers_scd2 -> history kept via __START_AT / __END_AT
-#   - `dp.create_auto_cdc_flow` is the GA replacement for the legacy
-#     `dlt.apply_changes` / SQL `APPLY CHANGES INTO` (exam may show both).
+#   - `dp.create_auto_cdc_flow` / SQL `AUTO CDC INTO` are the current API; older
+#     material shows the legacy names `dlt.apply_changes` / `APPLY CHANGES INTO`.
 # =====================================================================
 
 from pyspark import pipelines as dp
