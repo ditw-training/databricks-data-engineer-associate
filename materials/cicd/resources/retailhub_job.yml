@@ -1,0 +1,71 @@
+# =============================================================================
+# RetailHub — Lakeflow Job resource (3-task DAG)
+# =============================================================================
+#   validate_source  ──▶  run_retailhub_pipeline  ──▶  publish_report
+#   (notebook task)       (pipeline task)              (notebook task)
+#
+# The notebook tasks reuse materials/orchestration/task_01_validate.py and
+# task_03_report.py. Both are written against the shared samples dataset
+# (samples.nyctaxi.trips) so the job succeeds on any workspace — swapping
+# them to RetailHub-specific checks is a stretch exercise in lab_09.
+#
+# NOTE ON PATHS: relative notebook paths resolve relative to THIS file
+# (materials/cicd/resources/), hence "../../orchestration/...".
+# The parent databricks.yml lists ../orchestration under sync.paths.
+#
+# COMPUTE: no cluster is declared on the notebook tasks, so they run on
+# serverless jobs compute. The pipeline task runs the serverless pipeline
+# declared in retailhub_pipeline.yml.
+# =============================================================================
+
+resources:
+  jobs:
+    retailhub_job:
+      name: retailhub_job
+      description: >-
+        RetailHub capstone — validate source data, refresh the Lakeflow
+        Spark Declarative Pipeline (bronze/silver/gold star schema),
+        then publish a summary report.
+
+      max_concurrent_runs: 1
+
+      tasks:
+        - task_key: validate_source
+          notebook_task:
+            notebook_path: ../../orchestration/task_01_validate.py
+            base_parameters:
+              source_table: samples.nyctaxi.trips
+              min_rows: "100"
+
+        - task_key: run_retailhub_pipeline
+          depends_on:
+            - task_key: validate_source
+          pipeline_task:
+            # Reference to the pipeline resource declared in
+            # retailhub_pipeline.yml — resolved to the real pipeline id
+            # at deploy time.
+            pipeline_id: ${resources.pipelines.retailhub_pipeline.id}
+            full_refresh: false
+
+        - task_key: publish_report
+          depends_on:
+            - task_key: run_retailhub_pipeline
+          notebook_task:
+            notebook_path: ../../orchestration/task_03_report.py
+            base_parameters:
+              source_table: samples.nyctaxi.trips
+
+      # Email notifications — enable and adjust in your own deployment.
+      # In target mode `development` any schedule/trigger is paused anyway.
+      # email_notifications:
+      #   on_failure:
+      #     - your.email@example.com
+      #   on_success:
+      #     - your.email@example.com
+
+      # Optional schedule — commented out: the lab runs the job on demand
+      # via `databricks bundle run` (and dev mode would pause it anyway).
+      # schedule:
+      #   quartz_cron_expression: "0 0 2 * * ?"
+      #   timezone_id: Europe/Warsaw
+      #   pause_status: PAUSED

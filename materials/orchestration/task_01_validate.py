@@ -2,7 +2,7 @@
 # MAGIC %md
 # MAGIC # Task 1: Validate Source Data
 # MAGIC Validates row count against `min_rows` threshold.  
-# MAGIC Returns status + count via `dbutils.notebook.exit()`.
+# MAGIC Publishes `row_count` / `source_table` to downstream tasks via `dbutils.jobs.taskValues.set()`.
 
 # COMMAND ----------
 
@@ -30,10 +30,16 @@ print("Validation PASSED")
 
 # COMMAND ----------
 
-# Return result to next task
-import json
-dbutils.notebook.exit(json.dumps({
-    "status": "SUCCESS",
-    "source_table": source_table,
-    "row_count": row_count
-}))
+# Share results with downstream tasks as TASK VALUES.
+# NOTE: dbutils.notebook.exit() does NOT create task values — its string only goes to
+# a dbutils.notebook.run() caller / the run output. Outside a job, set() does nothing.
+# Inside a For each ITERATION task values are not supported (the Jobs API rejects the call:
+# "setting task values is not supported for iterations"), so skip them there.
+try:
+    dbutils.jobs.taskValues.set(key="row_count", value=row_count)
+    dbutils.jobs.taskValues.set(key="source_table", value=source_table)
+except Exception as e:
+    if "iteration" in str(e).lower():
+        print("Running as a For each iteration -> task values skipped")
+    else:
+        raise

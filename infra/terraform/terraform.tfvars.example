@@ -1,0 +1,37 @@
+# Copy to terraform.tfvars and adjust. NEVER commit terraform.tfvars
+# (it contains the SQL admin password).
+
+prefix   = "dea"
+location = "westeurope"
+
+# Day after Day 3 of the training - everything is safe to destroy after this.
+auto_delete_after = "2026-09-30"
+owner             = "dev@reyzdata.com"
+
+# --- Databricks workspace ---------------------------------------------------
+# true  = create a fresh premium workspace (14-day free DBU trial - schedule
+#         the training inside the trial window).
+# false = reuse an existing workspace; then fill in both values below.
+create_workspace = true
+# existing_workspace_host = "https://adb-1234567890123456.7.azuredatabricks.net"
+# existing_workspace_id   = "/subscriptions/.../resourceGroups/.../providers/Microsoft.Databricks/workspaces/..."
+
+# --- Unity Catalog ------------------------------------------------------------
+# Requires: az login identity is a workspace admin; the workspace is attached
+# to the (auto-provisioned) regional metastore; the group below exists.
+# Tip for a brand-new workspace: run a first apply with configure_uc = false,
+# then flip to true and apply again.
+configure_uc   = true
+training_group = "alt_trn_gr" # same as TRAINING_GROUP in notebooks/setup/00_pre_config.ipynb
+
+# --- Azure SQL (Lakeflow Connect CDC source) ---------------------------------
+sql_admin_login = "deatrainer"
+# Better: export TF_VAR_sql_admin_password instead of writing it here.
+sql_admin_password = "ChangeMe-Str0ng!Passw0rd"
+
+# Public IPs allowed through the SQL firewall (trainer laptop, training room).
+# Find yours: curl -s ifconfig.me
+trainer_ip_cidrs = [
+  # "203.0.113.7",
+  # "198.51.100.0/28",
+]

@@ -1,0 +1,39 @@
+# =============================================================================
+# RetailHub — Lakeflow Spark Declarative Pipeline resource
+# =============================================================================
+# Reuses the SQL sources of the capstone star schema (lab_07):
+#   materials/lakeflow/lakeflow_demo/transformations/
+#     01_bronze/  bronze_customers, bronze_orders, bronze_products
+#     02_silver/  silver_customers (SCD2), silver_orders, silver_products
+#     03_gold/    dim_* + fact_sales (expectations)
+#
+# NOTE ON PATHS: relative paths in a resource file are resolved relative to
+# THIS file (materials/cicd/resources/), not relative to databricks.yml —
+# hence the double "../..". The parent databricks.yml lists ../lakeflow
+# under sync.paths so these sources are uploaded with the bundle.
+# =============================================================================
+
+resources:
+  pipelines:
+    retailhub_pipeline:
+      name: retailhub_pipeline
+
+      # Publish tables to <catalog>.<schema_prefix>_lakeflow
+      catalog: ${var.catalog}
+      schema: ${var.schema_prefix}_lakeflow
+
+      serverless: true
+      continuous: false          # triggered — the job below runs it on demand
+      channel: CURRENT
+
+      # All pipeline source files, via a glob include (current bundle schema).
+      libraries:
+        - glob:
+            include: ../../lakeflow/lakeflow_demo/transformations/**
+
+      # The SQL sources read raw files via ${customer_path} / ${order_path} /
+      # ${product_path} — same keys as the manual pipeline built in lab_07.
+      configuration:
+        customer_path: /Volumes/${var.catalog}/default/datasets/customers
+        order_path: /Volumes/${var.catalog}/default/datasets/orders
+        product_path: /Volumes/${var.catalog}/default/datasets/products/products.parquet/

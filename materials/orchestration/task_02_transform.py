@@ -1,14 +1,13 @@
 # Databricks notebook source
 # MAGIC %md
 # MAGIC # Task 2: Transform Data
-# MAGIC Reads previous task result via `taskValues`, applies transformations  
-# MAGIC (duration, cost per mile). Returns row count.
+# MAGIC Reads the upstream `row_count` task value, applies transformations  
+# MAGIC (duration, cost per mile). Publishes `rows_transformed` as a task value.
 
 # COMMAND ----------
 
 from pyspark.sql.functions import *
 from datetime import date
-import json
 
 # Parameters
 dbutils.widgets.text("source_table", "samples.nyctaxi.trips")
@@ -19,17 +18,16 @@ run_date = dbutils.widgets.get("run_date") or str(date.today())
 
 # COMMAND ----------
 
-# Get result from previous task (optional)
-try:
-    prev_result = dbutils.jobs.taskValues.get(
-        taskKey="validate",
-        key="returnValue",
-        default="{}"
-    )
-    prev_data = json.loads(prev_result)
-    print(f"Previous task result: {prev_data}")
-except:
-    print("Running standalone (no previous task)")
+# Read the task value published by the upstream "validate" task.
+# debugValue -> used when running this notebook interactively (outside a job)
+# default    -> used in a job run if the key was not set upstream
+rows_validated = dbutils.jobs.taskValues.get(
+    taskKey="validate",
+    key="row_count",
+    default=0,
+    debugValue=0
+)
+print(f"Rows validated upstream: {rows_validated}")
 
 # COMMAND ----------
 
@@ -59,8 +57,5 @@ df_transformed.select(
 
 # COMMAND ----------
 
-# Return result
-dbutils.notebook.exit(json.dumps({
-    "status": "SUCCESS",
-    "rows_transformed": row_count
-}))
+# Publish result for downstream tasks
+dbutils.jobs.taskValues.set(key="rows_transformed", value=row_count)

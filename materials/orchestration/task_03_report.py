@@ -7,7 +7,6 @@
 # COMMAND ----------
 
 from pyspark.sql.functions import *
-import json
 from datetime import datetime
 
 # Parameters
@@ -45,9 +44,6 @@ print("="*50 + "\n")
 
 # COMMAND ----------
 
-# Return result
-dbutils.notebook.exit(json.dumps({
-    "status": "SUCCESS",
-    "total_trips": report.total_trips,
-    "total_revenue": float(report.total_revenue)
-}))
+# Publish headline metrics as task values (visible in the run's task output)
+dbutils.jobs.taskValues.set(key="total_trips", value=int(report.total_trips))
+dbutils.jobs.taskValues.set(key="total_revenue", value=float(report.total_revenue))

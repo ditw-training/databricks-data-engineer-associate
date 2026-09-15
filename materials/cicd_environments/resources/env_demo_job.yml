@@ -1,0 +1,38 @@
+# =============================================================================
+# env_demo_job — the SAME definition in every target; values come from variables
+# =============================================================================
+resources:
+  jobs:
+    env_demo_job:
+      name: env_demo_job            # dev -> "[dev <user>] env_demo_job", test -> "[test] env_demo_job"
+      description: "Shows which environment a bundle target deployed (module 09a demo)."
+      max_concurrent_runs: 1
+
+      # Job parameters: every task can read them as widgets
+      parameters:
+        - name: env_name
+          default: ${var.env_name}
+        - name: catalog
+          default: ${var.catalog}
+        - name: schema
+          default: ${var.schema}
+        - name: min_rows
+          default: ${var.min_rows}
+
+      tags:
+        bundle: ${bundle.name}
+        target: ${bundle.target}
+
+      # Nightly schedule — active only where the target sets UNPAUSED.
+      # Development mode pauses schedules only by default: this explicit
+      # pause_status overrides that preset, so the variable decides in every target.
+      schedule:
+        quartz_cron_expression: "0 0 2 * * ?"
+        timezone_id: Europe/Warsaw
+        pause_status: ${var.schedule_pause_status}
+
+      tasks:
+        - task_key: show_environment
+          # No compute declared -> serverless jobs compute
+          notebook_task:
+            notebook_path: ../src/show_environment.py

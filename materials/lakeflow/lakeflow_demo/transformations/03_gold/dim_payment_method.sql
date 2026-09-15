@@ -12,8 +12,9 @@ SELECT
 FROM (
   SELECT DISTINCT payment_method_code
   FROM silver_orders
-  
-  UNION ALL
-  
+
+  -- UNION (not UNION ALL): silver_orders already maps NULL to 'Unknown'
+  UNION
+
   SELECT 'Unknown' AS payment_method_code
 );
