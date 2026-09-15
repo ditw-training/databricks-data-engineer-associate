@@ -1,6 +1,6 @@
 # DEMO 3 — Metadata-driven Lakeflow Spark Declarative Pipelines
 
-Trainer-driven, ~20–25 min. One generic pipeline source file + one **config table** generate the whole
+Trainer-driven. One generic pipeline source file + one **config table** generate the whole
 bronze/silver graph dynamically — no per-table code.
 
 ## Why metadata-driven? (the point of this demo)

@@ -4,7 +4,7 @@
 
 Training materials for the **Databricks Certified Data Engineer Associate** certification preparation course — practical, engineering-first, built around one continuous business scenario (**RetailHub**: raw retail data → Bronze → Silver → Gold → Lakeflow pipeline → job orchestration → bundle deployment → monitoring → governance).
 
-**3 days × 6 h of content (360 min net per day; e.g. 09:00–16:00 with 15 + 30 + 15 min breaks)** | ~50% hands-on
+**3 days** | ~50% hands-on
 
 Exam: **45 scored questions, 90 minutes, $200.** Passing score is **not published** (set statistically by Databricks) — aim for ≥80% on practice quizzes. PySpark-dominant, with SQL for ingestion, DDL and governance.
 Exam guide version: **May 4, 2026** (re-check the official guide ~2 weeks before your exam date — it is revised every 4–6 months).

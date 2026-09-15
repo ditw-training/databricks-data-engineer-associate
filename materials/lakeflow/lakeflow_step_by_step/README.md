@@ -1,6 +1,6 @@
 # DEMO 1 — Lakeflow Spark Declarative Pipelines, step by step (build from scratch)
 
-Trainer-driven, ~35–45 min. You build a bronze → silver → gold pipeline **incrementally**, showing:
+Trainer-driven. You build a bronze → silver → gold pipeline **incrementally**, showing:
 incremental file ingestion + checkpoints → AUTO CDC (SCD1 vs SCD2) → gold MV → expectations (DROP → FAIL → quarantine).
 
 > DEMO 2 (the "current stack") is the finished pipeline in `../lakeflow_demo` — full star schema with flows/backfill.
@@ -42,6 +42,6 @@ incremental file ingestion + checkpoints → AUTO CDC (SCD1 vs SCD2) → gold MV
 ## Teaching notes
 
 - Keep **development mode ON** → cluster reuse, no retries — fast iteration during the demo.
-- The FAIL step really fails the update — that is the point; time-box it (~3 min).
+- The FAIL step really fails the update — that is the point; keep it short.
 - If short on time, cut step 9 (quarantine) — it is repeated in LAB 07's Task 7.
 - Everything here lands in schema `sdp_demo`, so it never collides with the LAB 07 pipeline (`lakeflow_demo`).

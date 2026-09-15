@@ -21,7 +21,7 @@ environment-specific value coming from **targets + variables**.
 | schedule | PAUSED (dev mode) | PAUSED | **UNPAUSED** |
 | `min_rows` | 1 | 100 | 1000 |
 
-## Demo script (≈20 min, from this folder)
+## Demo script (from this folder)
 
 ```bash
 # 1) resolved configuration per target
