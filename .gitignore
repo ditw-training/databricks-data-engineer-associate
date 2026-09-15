@@ -43,9 +43,10 @@ scripts/
 # Claude Code local state
 .claude/
 
-# Presentation sources (slide deck is maintained outside the repo)
+# Presentation / slide deck (maintained outside the repo)
 presentation/
 *.pptx
+PL-Databricks-Data-Engineering*.pdf
 
 # Terraform state & variables anywhere in the repo (infra/terraform has its own .gitignore too)
 .terraform/

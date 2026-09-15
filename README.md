@@ -167,4 +167,4 @@ Sources are Markdown files in `utilization/en/` and `utilization/pl/` (local onl
 
 - Exam alignment: official **May 4, 2026** exam guide (Databricks).
 - Platform naming as of 2026: **Lakeflow Spark Declarative Pipelines** (formerly DLT), **Lakeflow Jobs** (formerly Workflows), **Declarative Automation Bundles** (formerly Databricks Asset Bundles), **Git folders** (formerly Repos), serverless-first compute.
-- Notebooks in English; the Polish slide deck is `PL-Databricks-Data-Engineering.pdf`.
+- Notebooks in English; the Polish slide deck is distributed separately (not stored in the repo).
