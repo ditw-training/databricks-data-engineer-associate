@@ -18,6 +18,8 @@ terraform {
 }
 
 provider "azurerm" {
+  resource_provider_registrations = var.azure_resource_provider_registrations
+
   features {
     resource_group {
       # The Databricks managed RG contains auto-created resources; allow destroy.

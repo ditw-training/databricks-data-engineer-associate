@@ -15,7 +15,9 @@ resource "random_string" "suffix" {
 locals {
   suffix = random_string.suffix.result
 
-  resource_group_name = "rg-${var.prefix}-training"
+  # Created RG (default) or a pre-existing one handed out by the subscription
+  # admin. Referencing the resource/data source keeps the dependency graph.
+  resource_group_name = var.existing_resource_group_name != "" ? data.azurerm_resource_group.existing[0].name : azurerm_resource_group.this[0].name
 
   # Storage account: lowercase alphanumeric, max 24 chars, globally unique.
   storage_account_name = substr("st${var.prefix}training${local.suffix}", 0, 24)
@@ -51,7 +53,17 @@ check "existing_workspace_inputs" {
 }
 
 resource "azurerm_resource_group" "this" {
-  name     = local.resource_group_name
+  count = var.existing_resource_group_name == "" ? 1 : 0
+
+  name     = "rg-${var.prefix}-training"
   location = var.location
   tags     = local.common_tags
+}
+
+# Pre-existing RG (e.g. RG-scoped Owner only). Not tagged and never deleted by
+# `terraform destroy` - only the resources inside it are.
+data "azurerm_resource_group" "existing" {
+  count = var.existing_resource_group_name != "" ? 1 : 0
+
+  name = var.existing_resource_group_name
 }

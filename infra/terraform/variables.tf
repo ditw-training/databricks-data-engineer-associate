@@ -15,6 +15,18 @@ variable "location" {
   default     = "westeurope"
 }
 
+variable "existing_resource_group_name" {
+  description = "Deploy into this pre-existing resource group instead of creating rg-<prefix>-training. Resources still go to var.location (the RG's own region does not matter). Leave empty to create the RG."
+  type        = string
+  default     = ""
+}
+
+variable "azure_resource_provider_registrations" {
+  description = "azurerm provider's automatic resource provider registration (\"core\", \"extended\", \"all\", \"none\", \"legacy\"). Use \"none\" when the identity is Owner only on a resource group - registering providers needs subscription scope."
+  type        = string
+  default     = "core"
+}
+
 variable "auto_delete_after" {
   description = "Date (YYYY-MM-DD) after which everything here is garbage — stamped as the 'auto-delete-after' tag so subscription cleanup jobs / humans know it is safe to destroy. Set it to the day after Day 3 of the training."
   type        = string
@@ -79,6 +91,12 @@ variable "training_group" {
 # ---------------------------------------------------------------------------
 # Azure SQL (Lakeflow Connect source)
 # ---------------------------------------------------------------------------
+
+variable "create_sql_server" {
+  description = "Create the Azure SQL server + AdventureWorksLT DB here. Set false when the Lakeflow Connect source lives elsewhere (e.g. Microsoft.Sql not registered on this subscription - see infra/LAKEFLOW_CONNECT_CONNECTION.md)."
+  type        = bool
+  default     = true
+}
 
 variable "sql_admin_login" {
   description = "Administrator login for the Azure SQL logical server."

@@ -10,9 +10,11 @@
 #   supported by Lakeflow Connect - see infra/sql/enable_cdc.sql.
 
 resource "azurerm_mssql_server" "this" {
+  count = var.create_sql_server ? 1 : 0
+
   name                         = local.sql_server_name
-  resource_group_name          = azurerm_resource_group.this.name
-  location                     = azurerm_resource_group.this.location
+  resource_group_name          = local.resource_group_name
+  location                     = var.location
   version                      = "12.0"
   administrator_login          = var.sql_admin_login
   administrator_login_password = var.sql_admin_password
@@ -22,8 +24,10 @@ resource "azurerm_mssql_server" "this" {
 }
 
 resource "azurerm_mssql_database" "adventureworks" {
+  count = var.create_sql_server ? 1 : 0
+
   name      = local.sql_database_name
-  server_id = azurerm_mssql_server.this.id
+  server_id = azurerm_mssql_server.this[0].id
 
   # Serverless General Purpose, 1 vCore - smallest CDC-capable SKU.
   sku_name                    = "GP_S_Gen5_1"
@@ -49,8 +53,10 @@ resource "azurerm_mssql_database" "adventureworks" {
 # resources to access this server" - required for the Lakeflow Connect
 # ingestion gateway running in Azure.
 resource "azurerm_mssql_firewall_rule" "allow_azure_services" {
+  count = var.create_sql_server ? 1 : 0
+
   name             = "AllowAzureServices"
-  server_id        = azurerm_mssql_server.this.id
+  server_id        = azurerm_mssql_server.this[0].id
   start_ip_address = "0.0.0.0"
   end_ip_address   = "0.0.0.0"
 }
@@ -58,7 +64,7 @@ resource "azurerm_mssql_firewall_rule" "allow_azure_services" {
 # Trainer/classroom IPs. Accepts plain IPs or CIDRs; a CIDR is expanded to
 # its first..last address range.
 locals {
-  trainer_ip_rules = {
+  trainer_ip_rules = !var.create_sql_server ? {} : {
     for idx, entry in var.trainer_ip_cidrs :
     format("trainer-%02d", idx) => {
       cidr  = can(regex("/", entry)) ? entry : "${entry}/32"
@@ -72,7 +78,7 @@ resource "azurerm_mssql_firewall_rule" "trainer" {
   for_each = local.trainer_ip_rules
 
   name             = each.key
-  server_id        = azurerm_mssql_server.this.id
+  server_id        = azurerm_mssql_server.this[0].id
   start_ip_address = each.value.start
   end_ip_address   = cidrhost(each.value.cidr, pow(2, 32 - each.value.bits) - 1)
 }

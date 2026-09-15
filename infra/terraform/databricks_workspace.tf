@@ -11,8 +11,8 @@ resource "azurerm_databricks_workspace" "this" {
   count = var.create_workspace ? 1 : 0
 
   name                = local.workspace_name
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = local.resource_group_name
+  location            = var.location
   # "trial" = Premium features (Unity Catalog) with 14-day free DBUs.
   # "premium" does NOT start the free trial. Flip to "premium" in place if the
   # workspace must outlive the trial window.

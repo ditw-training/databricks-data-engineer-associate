@@ -1,6 +1,6 @@
 output "resource_group_name" {
   description = "Training resource group."
-  value       = azurerm_resource_group.this.name
+  value       = local.resource_group_name
 }
 
 output "workspace_url" {
@@ -30,20 +30,20 @@ output "raw_container_url" {
 
 output "sql_server_fqdn" {
   description = "Fully qualified domain name of the Azure SQL logical server."
-  value       = azurerm_mssql_server.this.fully_qualified_domain_name
+  value       = var.create_sql_server ? azurerm_mssql_server.this[0].fully_qualified_domain_name : null
 }
 
 output "sql_database_name" {
   description = "Name of the AdventureWorksLT sample database."
-  value       = azurerm_mssql_database.adventureworks.name
+  value       = var.create_sql_server ? azurerm_mssql_database.adventureworks[0].name : null
 }
 
 output "lakeflow_connect_connection_summary" {
   description = "Values to paste into the Lakeflow Connect / UC connection UI (Catalog > External data > Connections > SQL Server). User is created by infra/sql/enable_cdc.sql."
-  value = {
-    host     = azurerm_mssql_server.this.fully_qualified_domain_name
+  value = var.create_sql_server ? {
+    host     = azurerm_mssql_server.this[0].fully_qualified_domain_name
     port     = 1433
-    database = azurerm_mssql_database.adventureworks.name
+    database = azurerm_mssql_database.adventureworks[0].name
     user     = "lakeflow_connect"
-  }
+  } : null
 }
