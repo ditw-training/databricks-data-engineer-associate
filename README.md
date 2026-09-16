@@ -23,7 +23,7 @@ Exam guide version: **May 4, 2026** (re-check the official guide ~2 weeks before
 | 6 | Troubleshooting, Monitoring, and Optimization | 10% |
 | 7 | Governance and Security | 15% |
 
-> 🔥 The current exam puts strong emphasis on **Lakeflow Connect**, **Lakeflow Spark Declarative Pipelines**, **Lakeflow Jobs**, **Declarative Automation Bundles (formerly Databricks Asset Bundles)**, Spark-UI troubleshooting and **Unity Catalog ABAC**.
+> The current exam puts strong emphasis on **Lakeflow Connect**, **Lakeflow Spark Declarative Pipelines**, **Lakeflow Jobs**, **Declarative Automation Bundles (formerly Databricks Asset Bundles)**, Spark-UI troubleshooting and **Unity Catalog ABAC**.
 
 ---
 

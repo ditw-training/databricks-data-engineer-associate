@@ -2,7 +2,7 @@
 # MAGIC %md
 # MAGIC # DEMO 3 — Config table for the metadata-driven pipeline
 # MAGIC
-# MAGIC 👨‍🏫 **TRAINER notebook** — run BEFORE creating the pipeline. Not part of the pipeline source.
+# MAGIC **TRAINER notebook** — run BEFORE creating the pipeline. Not part of the pipeline source.
 # MAGIC
 # MAGIC The pipeline (`transformations/01_dynamic_pipeline.py`) reads this table at update start
 # MAGIC and generates one bronze (+ optional silver) dataset **per row**.
@@ -62,7 +62,7 @@ print(f"  config_table = {CONFIG_TABLE}")
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## 🎬 Live wow-moment (Step 4 of the walkthrough)
+# MAGIC ## Live wow-moment (Step 4 of the walkthrough)
 # MAGIC Run this AFTER the first successful pipeline update, then start a new update:
 # MAGIC a brand-new table appears in the graph — **no code changed**.
 

@@ -2,7 +2,7 @@
 # MAGIC %md
 # MAGIC # DEMO 1 Driver — Lakeflow SDP step by step
 # MAGIC
-# MAGIC 👨‍🏫 **TRAINER notebook** — run these cells *between* pipeline updates. It is **not** part of the pipeline source.
+# MAGIC **TRAINER notebook** — run these cells *between* pipeline updates. It is **not** part of the pipeline source.
 # MAGIC
 # MAGIC Follow the step numbers from `README.md`.
 
@@ -38,7 +38,7 @@ display(dbutils.fs.ls(ORDERS_LANDING) + dbutils.fs.ls(CUSTOMERS_LANDING))
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ➡️ Now **run the pipeline** (only `01_bronze_orders.py` active). Then run it a SECOND time with no new files:
+# MAGIC Now **run the pipeline** (only `01_bronze_orders.py` active). Then run it a SECOND time with no new files:
 # MAGIC the update reports **0 rows** — the flow's **checkpoint** (managed by the pipeline) remembers which files were already ingested.
 # MAGIC A *full refresh* resets that checkpoint and rebuilds the table from all files.
 

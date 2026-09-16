@@ -9,7 +9,7 @@ deliberately broken task notebooks (Databricks source format):
 | 2 `transform` | `task_transform.py` | Join on `left(customer_id, 8)` — a low-cardinality truncated key → ~100× row explosion visible in shuffle/output-row metrics; `spark.sql.shuffle.partitions = 4000` → thousands of tiny tasks |
 | 3 `publish` | `task_publish.py` | Reads `silver.ts_orders_final`, a table no upstream task creates (transform writes `ts_orders_enriched`); in the job DAG it depends only on `ingest`, not `transform` |
 
-## 👨‍🏫 Deploy before the lab (Day 3 morning)
+## Deploy before the lab (Day 3 morning)
 
 1. Import the three notebooks into the workspace (e.g.
    `/Workspace/Shared/retailhub_broken_job/`). The `.py` files are Databricks
