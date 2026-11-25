@@ -1,57 +1,12 @@
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
-
-# Python
-__pycache__/
-*.py[cod]
-*.pyo
-.env
-.venv/
-venv/
-
-# Jupyter
-.ipynb_checkpoints/
-*.ipynb_checkpoints
-
-# VSCode
-.vscode/
-
-# Databricks / Spark temp
-derby.log
-metastore_db/
-spark-warehouse/
-
-# Training utilities & build scripts (local only)
-utilization/
-scripts/
-*.zip
-
-# PDF build workspace (scripts/build_pdfs.sh)
-.build/
-
-# Agent working notes (local only)
-.agents/
-
-# Local-only secrets / credentials (participant logins etc.)
-.private/
-
-# Databricks CLI / bundle deployment state, IDE extension state
-.databricks/
-
-# Claude Code local state
-.claude/
-
-# Presentation sources (slide deck is maintained outside the repo)
+# Trainer-only and tooling (not published to participants)
+docs/INSTRUCTOR_GUIDE.md
+docs/practice_exams.html
+apps/**/CLAUDE.md
+apps/SPEC_workshop_guide.md
+tools/
+infra/
 presentation/
 *.pptx
-
-# Terraform state & variables anywhere in the repo (infra/terraform has its own .gitignore too)
-.terraform/
-*.tfstate
-*.tfstate.*
-*.tfvars
-
-# Logs
-*.log
+.DS_Store
+.venv/
+node_modules/
