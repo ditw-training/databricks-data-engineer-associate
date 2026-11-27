@@ -5,7 +5,9 @@
 CREATE OR REFRESH MATERIALIZED VIEW dim_product
 AS
 SELECT
-  row_number() OVER (ORDER BY product_id) AS product_key,
+  -- UNKNOWN gets -1, the key fact_sales uses for a product it cannot find
+  CASE WHEN is_unknown = 1 THEN -1
+       ELSE row_number() OVER (ORDER BY is_unknown, product_id) END AS product_key,
   product_id,
   product_name,
   subcategory_code,

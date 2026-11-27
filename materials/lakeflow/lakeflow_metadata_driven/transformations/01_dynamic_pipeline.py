@@ -11,9 +11,11 @@
 #        - load_type = scd1/scd2 -> silver_<entity>_dyn via AUTO CDC
 #   4. Add a config row -> next update grows the graph. No code change.
 #
-# CLASSIC PITFALL shown on purpose: Python closures in a loop capture the
-# VARIABLE, not the value — hence the `cfg=cfg` default-argument trick and
-# explicit `name=` on every decorator.
+# CLOSURE PITFALL (does not happen here): a Python closure in a loop captures
+# the VARIABLE, not the value. With @dp.table directly in the for loop, every
+# table would read the LAST row. The factories already pin each row, so the
+# default args (cfg=cfg, entity=entity) are extra safety. Explicit `name=` is
+# required: every function is called _bronze or _silver.
 # =====================================================================
 
 from pyspark import pipelines as dp

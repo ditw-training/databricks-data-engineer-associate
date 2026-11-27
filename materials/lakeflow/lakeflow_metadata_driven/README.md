@@ -32,6 +32,8 @@ One row per entity. `load_type` decides the silver pattern:
 | orders | orders | json | **append** | — | — | `{"valid_order":"order_id IS NOT NULL", ...}` |
 | products | products | csv | **scd2** | product_id | `_ingest_ts` | `{"valid_id":"product_id IS NOT NULL"}` |
 
+> `customers/*.csv` matches both `customers.csv` and `customers_new.csv`, and `_ingest_ts` is the file modification time. SCD1 therefore keeps the values of the file written last. On the test workspace `customers_new.csv` landed 1 s after `customers.csv`, so the changed values win. If the files land in another order, SCD1 shows the old values without any error.
+
 ## Pipeline setup
 
 1. Run `00_create_config_table.py` first (creates schema `sdp_meta` + the table).
@@ -45,9 +47,9 @@ One row per entity. `load_type` decides the silver pattern:
 | Step | Do | Say |
 |---|---|---|
 | 1 | Show the config table (3 rows) | "The pipeline's shape lives in DATA, not code." |
-| 2 | Open `01_dynamic_pipeline.py` | One loop; factory functions; note the closure gotcha (`entity=entity` default arg). |
+| 2 | Open `01_dynamic_pipeline.py` | One loop; factory functions. Closure pitfall: the factories already pin each row, so it does not happen here. It appears only if you put `@dp.table` directly in the `for` loop: every table then reads the LAST row. |
 | 3 | Run the pipeline | Graph shows 3 bronze + 2 SCD silver + 1 checked silver — all from 3 config rows. |
-| 4 | **Live wow-moment:** run the "add a row" cell in the notebook (`orders_stream` entity), start a new update | A NEW table appears in the graph — zero code changed. |
+| 4 | **Live wow-moment:** run the "add a row" cell in the notebook (`orders_stream` entity), start a new update | A NEW table appears in the graph — zero code changed. `orders/stream/` in the repo has 3 files (30,000 rows). If the Volume also has `orders_stream_004.json`, the table has 40,000 rows. |
 | 5 | Flip `active = false` for one entity, update again | Dataset disappears from the graph (table remains in UC until dropped). |
 
 ## Where this shows up in the real world / exam
